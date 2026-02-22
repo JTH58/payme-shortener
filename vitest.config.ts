@@ -5,6 +5,11 @@ export default defineWorkersConfig({
     poolOptions: {
       workers: {
         wrangler: { configPath: "./wrangler.toml" },
+        miniflare: {
+          bindings: {
+            FPE_KEY: "test-fpe-key-for-unit-tests-only",
+          },
+        },
       },
     },
   },

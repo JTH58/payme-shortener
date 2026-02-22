@@ -7,10 +7,34 @@ export function renderResolvePage(
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>s.payme.tw</title>
+<title>s.payme.tw — 解密中</title>
+<link rel="icon" href="https://payme.tw/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:rgba(255,255,255,.87);background:#020617;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+body::before{content:'';position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:600px;background:rgba(59,130,246,.1);border-radius:50%;filter:blur(120px);pointer-events:none}
+.card{position:relative;z-index:1;text-align:center;max-width:400px;width:90%;padding:2.5rem 2rem;background:rgba(255,255,255,.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:1.25rem;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.icon{width:64px;height:64px;margin:0 auto 1.5rem;border-radius:1rem;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.95)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:32px;height:32px;margin:1.5rem auto;border:3px solid rgba(255,255,255,.1);border-top-color:rgba(96,165,250,.8);border-radius:50%;animation:spin .8s linear infinite}
+h1{font-size:1.4rem;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:.5rem}
+p{color:rgba(255,255,255,.4);font-size:.9rem;margin:.25rem 0;line-height:1.5}
+.status{color:rgba(96,165,250,.8);font-size:.8rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:.5rem}
+.btn{display:inline-block;margin-top:1.5rem;padding:.625rem 1.5rem;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.3);color:rgba(96,165,250,1);text-decoration:none;border-radius:.625rem;font-weight:500;font-size:.875rem;transition:all .2s}
+.btn:hover{background:rgba(59,130,246,.3)}
+.error-icon{font-size:2.5rem;margin-bottom:1rem}
+</style>
 </head>
 <body>
-<div id="app"></div>
+<div class="card" id="app">
+  <img class="icon" src="https://payme.tw/icon-splash-128.png" alt="PayMe.tw">
+  <div class="spinner"></div>
+  <p class="status">Decrypting</p>
+</div>
 <script>
 (function() {
   var CIPHERTEXT = "${ciphertext}";
@@ -53,18 +77,17 @@ export function renderResolvePage(
   var clientKeyMatch = hash.match(/^[A-Za-z0-9]{4}/);
 
   if (!clientKeyMatch) {
-    app.innerHTML = '<h1>連結不完整</h1><p>請確認連結是否正確</p><a href="https://payme.tw">前往 PayMe.tw</a>';
+    app.innerHTML = '<div class="error-icon">&#128279;</div><h1>連結不完整</h1><p>請確認連結是否正確</p><a class="btn" href="https://payme.tw">前往 PayMe.tw</a>';
     return;
   }
 
   var clientKey = clientKeyMatch[0];
-  app.innerHTML = '<p>解密中...</p>';
 
   deriveFullKey(clientKey, SERVER_KEY)
     .then(function(key) { return decrypt(CIPHERTEXT, key); })
     .then(function(url) { location.href = url; })
     .catch(function() {
-      app.innerHTML = '<h1>連結無效或已損壞</h1><p>解密失敗，連結可能已被竄改。</p><a href="https://payme.tw">前往 PayMe.tw</a>';
+      app.innerHTML = '<div class="error-icon">&#128683;</div><h1>連結無效或已損壞</h1><p>解密失敗，連結可能已被竄改。</p><a class="btn" href="https://payme.tw">前往 PayMe.tw</a>';
     });
 })();
 </script>
