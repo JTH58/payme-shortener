@@ -98,6 +98,30 @@ describe("POST /api/shorten", () => {
     const record = JSON.parse(stored!);
     expect(record.ciphertext).toBe("my-ciphertext");
     expect(record.serverKey).toBe("my-serverkey");
+    expect(record.mode).toBe("simple"); // default mode
+  });
+
+  it("stores mode=bill when specified", async () => {
+    await env.SHORTENER_KV.put("_counter", "200");
+
+    const response = await SELF.fetch("https://s.payme.tw/api/shorten", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://payme.tw",
+        "CF-Connecting-IP": "mode-test-ip",
+      },
+      body: JSON.stringify({
+        ciphertext: "bill-ct",
+        serverKey: "bill-sk",
+        mode: "bill",
+      }),
+    });
+
+    const json = (await response.json()) as { shortCode: string };
+    const stored = await env.SHORTENER_KV.get(json.shortCode);
+    const record = JSON.parse(stored!);
+    expect(record.mode).toBe("bill");
   });
 
   it("increments counter on each request", async () => {

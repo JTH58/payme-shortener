@@ -1,4 +1,4 @@
-import { Env, ShortLinkRecord } from "../types";
+import { Env, ShortLinkRecord, LinkMode } from "../types";
 import { counterToShortCode } from "../services/shortcode";
 import { checkRateLimit } from "../services/rate-limiter";
 
@@ -20,7 +20,7 @@ export async function handleShorten(
     return new Response("Too Many Requests", { status: 429 });
   }
 
-  let body: { ciphertext?: string; serverKey?: string };
+  let body: { ciphertext?: string; serverKey?: string; mode?: string };
   try {
     body = await request.json();
   } catch {
@@ -33,6 +33,8 @@ export async function handleShorten(
     });
   }
 
+  const mode: LinkMode = body.mode === "bill" ? "bill" : "simple";
+
   // Atomic counter increment
   const counterStr = await env.SHORTENER_KV.get("_counter");
   const counter = counterStr ? parseInt(counterStr, 10) : 0;
@@ -43,6 +45,7 @@ export async function handleShorten(
   const record: ShortLinkRecord = {
     ciphertext: body.ciphertext,
     serverKey: body.serverKey,
+    mode,
   };
 
   await env.SHORTENER_KV.put(shortCode, JSON.stringify(record), {

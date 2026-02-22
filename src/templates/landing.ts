@@ -5,6 +5,21 @@ export function renderLandingPage(): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>s.payme.tw — PayMe.tw 專用安全短連結</title>
+<meta name="description" content="連伺服器自己都解不開的加密短網址。PayMe.tw 專用零知識安全短連結服務。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://s.payme.tw/">
+<meta property="og:title" content="s.payme.tw — PayMe.tw 專用安全短連結">
+<meta property="og:description" content="連伺服器自己都解不開的加密短網址。12 小時後，一切自動消失。">
+<meta property="og:image" content="https://payme.tw/og-simple.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PayMe.tw Preview">
+<meta property="og:site_name" content="PayMe.tw">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="s.payme.tw — PayMe.tw 專用安全短連結">
+<meta name="twitter:description" content="連伺服器自己都解不開的加密短網址。12 小時後，一切自動消失。">
+<meta name="twitter:image" content="https://payme.tw/og-simple.jpg">
 <link rel="icon" href="https://payme.tw/favicon.ico">
 <link rel="apple-touch-icon" href="https://payme.tw/apple-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">

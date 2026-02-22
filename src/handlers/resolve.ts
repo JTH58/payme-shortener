@@ -18,7 +18,7 @@ export async function handleResolve(
   const record: ShortLinkRecord = JSON.parse(raw);
 
   return new Response(
-    renderResolvePage(record.ciphertext, record.serverKey),
+    renderResolvePage(record.ciphertext, record.serverKey, record.mode || "simple"),
     {
       status: 200,
       headers: { "Content-Type": "text/html; charset=utf-8" },

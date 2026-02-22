@@ -5,7 +5,21 @@ export function renderExpiredPage(): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>連結已過期 — s.payme.tw</title>
+<meta name="description" content="此短連結已過期。PayMe.tw 短連結有效期為 12 小時。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="連結已過期 — s.payme.tw">
+<meta property="og:description" content="此短連結已過期，請向對方索取新連結。">
+<meta property="og:image" content="https://payme.tw/og-simple.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="PayMe.tw">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="連結已過期 — s.payme.tw">
+<meta name="twitter:description" content="此短連結已過期，請向對方索取新連結。">
+<meta name="twitter:image" content="https://payme.tw/og-simple.jpg">
 <link rel="icon" href="https://payme.tw/favicon.ico">
+<link rel="apple-touch-icon" href="https://payme.tw/apple-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">

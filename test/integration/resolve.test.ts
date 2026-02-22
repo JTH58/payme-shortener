@@ -58,6 +58,30 @@ describe("GET /:shortCode (Resolve)", () => {
     expect(html).toContain("連結不完整");
   });
 
+  it("resolve page shows simple OG meta by default", async () => {
+    await env.SHORTENER_KV.put(
+      "oGs1",
+      JSON.stringify({ ciphertext: "ct", serverKey: "sk" })
+    );
+
+    const response = await SELF.fetch("https://s.payme.tw/oGs1");
+    const html = await response.text();
+    expect(html).toContain("PayMe.TW 收款");
+    expect(html).toContain("og-simple.jpg");
+  });
+
+  it("resolve page shows bill OG meta when mode=bill", async () => {
+    await env.SHORTENER_KV.put(
+      "oGb1",
+      JSON.stringify({ ciphertext: "ct", serverKey: "sk", mode: "bill" })
+    );
+
+    const response = await SELF.fetch("https://s.payme.tw/oGb1");
+    const html = await response.text();
+    expect(html).toContain("PayMe.TW 分帳");
+    expect(html).toContain("og-bill.jpg");
+  });
+
   it("resolve page contains invalid-link error message", async () => {
     await env.SHORTENER_KV.put(
       "eRrR",

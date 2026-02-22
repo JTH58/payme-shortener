@@ -1,14 +1,45 @@
+import { LinkMode } from "../types";
+
+const OG_META: Record<LinkMode, { title: string; description: string; image: string }> = {
+  simple: {
+    title: "PayMe.TW 收款",
+    description: "點擊連結查看詳細金額並進行轉帳。",
+    image: "https://payme.tw/og-simple.jpg",
+  },
+  bill: {
+    title: "PayMe.TW 分帳",
+    description: "點擊連結查看帳單細項，認領屬於您的消費項目。",
+    image: "https://payme.tw/og-bill.jpg",
+  },
+};
+
 export function renderResolvePage(
   ciphertext: string,
-  serverKey: string
+  serverKey: string,
+  mode: LinkMode = "simple"
 ): string {
+  const og = OG_META[mode];
   return `<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>s.payme.tw — 解密中</title>
+<title>${og.title} — PayMe.tw</title>
+<meta name="description" content="${og.description}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${og.title}">
+<meta property="og:description" content="${og.description}">
+<meta property="og:image" content="${og.image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="PayMe.tw">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${og.title}">
+<meta name="twitter:description" content="${og.description}">
+<meta name="twitter:image" content="${og.image}">
 <link rel="icon" href="https://payme.tw/favicon.ico">
+<link rel="apple-touch-icon" href="https://payme.tw/apple-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
