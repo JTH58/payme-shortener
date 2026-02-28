@@ -2,12 +2,12 @@ import { describe, it, expect } from "vitest";
 import { SELF, env } from "cloudflare:test";
 
 describe("GET /:shortCode (Resolve)", () => {
-  it("returns 200 HTML with ciphertext and serverKey when KV has data", async () => {
+  it("returns 200 HTML when KV has data", async () => {
     await env.SHORTENER_KV.put(
       "aBcD",
       JSON.stringify({
         ciphertext: "test-ct-data",
-        serverKey: "test-sk-data",
+        mode: "simple",
       })
     );
 
@@ -16,8 +16,9 @@ describe("GET /:shortCode (Resolve)", () => {
     expect(response.headers.get("Content-Type")).toContain("text/html");
 
     const html = await response.text();
-    expect(html).toContain("test-ct-data");
-    expect(html).toContain("test-sk-data");
+    expect(html).not.toContain("SERVER_KEY");
+    expect(html).not.toContain("deriveFullKey");
+    expect(html).toContain("/api/resolve");
   });
 
   it("returns expired page when KV returns null", async () => {
@@ -35,22 +36,22 @@ describe("GET /:shortCode (Resolve)", () => {
     expect(html).toContain("請向對方索取新連結");
   });
 
-  it("resolve page HTML contains client-side decrypt script", async () => {
+  it("resolve page calls /api/resolve for decryption", async () => {
     await env.SHORTENER_KV.put(
       "tEsT",
-      JSON.stringify({ ciphertext: "ct", serverKey: "sk" })
+      JSON.stringify({ ciphertext: "ct", mode: "simple" })
     );
 
     const response = await SELF.fetch("https://s.payme.tw/tEsT");
     const html = await response.text();
-    expect(html).toContain("deriveFullKey");
+    expect(html).toContain("/api/resolve");
     expect(html).toContain("location.hash");
   });
 
   it("resolve page contains incomplete-link message logic", async () => {
     await env.SHORTENER_KV.put(
       "hAsH",
-      JSON.stringify({ ciphertext: "ct", serverKey: "sk" })
+      JSON.stringify({ ciphertext: "ct", mode: "simple" })
     );
 
     const response = await SELF.fetch("https://s.payme.tw/hAsH");
@@ -61,7 +62,7 @@ describe("GET /:shortCode (Resolve)", () => {
   it("resolve page shows simple OG meta by default", async () => {
     await env.SHORTENER_KV.put(
       "oGs1",
-      JSON.stringify({ ciphertext: "ct", serverKey: "sk" })
+      JSON.stringify({ ciphertext: "ct", mode: "simple" })
     );
 
     const response = await SELF.fetch("https://s.payme.tw/oGs1");
@@ -73,7 +74,7 @@ describe("GET /:shortCode (Resolve)", () => {
   it("resolve page shows bill OG meta when mode=bill", async () => {
     await env.SHORTENER_KV.put(
       "oGb1",
-      JSON.stringify({ ciphertext: "ct", serverKey: "sk", mode: "bill" })
+      JSON.stringify({ ciphertext: "ct", mode: "bill" })
     );
 
     const response = await SELF.fetch("https://s.payme.tw/oGb1");
@@ -85,7 +86,7 @@ describe("GET /:shortCode (Resolve)", () => {
   it("resolve page contains invalid-link error message", async () => {
     await env.SHORTENER_KV.put(
       "eRrR",
-      JSON.stringify({ ciphertext: "ct", serverKey: "sk" })
+      JSON.stringify({ ciphertext: "ct", mode: "simple" })
     );
 
     const response = await SELF.fetch("https://s.payme.tw/eRrR");

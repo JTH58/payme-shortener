@@ -11,12 +11,13 @@ describe("GET / (Landing Page)", () => {
     expect(html).toContain("PayMe.tw 專用安全短連結");
   });
 
-  it("contains security architecture descriptions", async () => {
+  it("contains security architecture descriptions (encrypted storage)", async () => {
     const response = await SELF.fetch("https://s.payme.tw/");
     const html = await response.text();
 
-    expect(html).toContain("零知識");
-    expect(html).toContain("雙鑰匙");
+    expect(html).toContain("密文儲存");
+    expect(html).not.toContain("零知識");
+    expect(html).not.toContain("雙鑰匙");
     expect(html).toContain("12 小時");
     expect(html).toContain("Hash");
     expect(html).toContain("開源");

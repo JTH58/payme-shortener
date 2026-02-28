@@ -1,11 +1,6 @@
-export async function deriveFullKey(
-  clientKey: string,
-  serverKeyB64: string
-): Promise<CryptoKey> {
+export async function deriveEncKey(clientKey: string): Promise<CryptoKey> {
   const enc = new TextEncoder();
-  const serverKeyBytes = base64urlDecode(serverKeyB64);
-
-  const ikm = new Uint8Array([...enc.encode(clientKey), ...serverKeyBytes]);
+  const ikm = enc.encode(clientKey);
 
   const rawKey = await crypto.subtle.importKey(
     "raw",
@@ -74,11 +69,6 @@ export function base64urlDecode(str: string): Uint8Array {
   const padded = str.replace(/-/g, "+").replace(/_/g, "/");
   const binStr = atob(padded);
   return Uint8Array.from(binStr, (c) => c.charCodeAt(0));
-}
-
-export function generateServerKey(): string {
-  const bytes = crypto.getRandomValues(new Uint8Array(32));
-  return base64urlEncode(bytes);
 }
 
 export function generateClientKey(): string {

@@ -7,6 +7,14 @@ export type LinkMode = "simple" | "bill";
 
 export interface ShortLinkRecord {
   ciphertext: string;
-  serverKey: string;
   mode: LinkMode;
+}
+
+export interface ResolveRequest {
+  code: string;
+  clientKey: string;
+}
+
+export interface ResolveResponse {
+  url: string;
 }

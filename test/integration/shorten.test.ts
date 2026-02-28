@@ -1,9 +1,8 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { SELF, env } from "cloudflare:test";
 
 describe("POST /api/shorten", () => {
   it("succeeds with valid origin and body, returns 4-char shortCode", async () => {
-    // Ensure counter starts at 0
     await env.SHORTENER_KV.put("_counter", "0");
 
     const response = await SELF.fetch("https://s.payme.tw/api/shorten", {
@@ -15,7 +14,6 @@ describe("POST /api/shorten", () => {
       },
       body: JSON.stringify({
         ciphertext: "test-ciphertext-data",
-        serverKey: "test-server-key-data",
       }),
     });
 
@@ -33,13 +31,10 @@ describe("POST /api/shorten", () => {
       },
       body: JSON.stringify({
         ciphertext: "data",
-        serverKey: "key",
       }),
     });
 
     expect(response.status).toBe(403);
-
-    // Verify no KV write happened (counter unchanged)
   });
 
   it("returns 429 after 10 requests from same IP", async () => {
@@ -54,7 +49,6 @@ describe("POST /api/shorten", () => {
         },
         body: JSON.stringify({
           ciphertext: `ct-${i}`,
-          serverKey: `sk-${i}`,
         }),
       });
     }
@@ -68,14 +62,13 @@ describe("POST /api/shorten", () => {
       },
       body: JSON.stringify({
         ciphertext: "ct-11",
-        serverKey: "sk-11",
       }),
     });
 
     expect(response.status).toBe(429);
   });
 
-  it("writes record to KV with correct data", async () => {
+  it("writes record to KV without serverKey", async () => {
     await env.SHORTENER_KV.put("_counter", "100");
 
     const response = await SELF.fetch("https://s.payme.tw/api/shorten", {
@@ -87,7 +80,6 @@ describe("POST /api/shorten", () => {
       },
       body: JSON.stringify({
         ciphertext: "my-ciphertext",
-        serverKey: "my-serverkey",
       }),
     });
 
@@ -97,8 +89,8 @@ describe("POST /api/shorten", () => {
 
     const record = JSON.parse(stored!);
     expect(record.ciphertext).toBe("my-ciphertext");
-    expect(record.serverKey).toBe("my-serverkey");
-    expect(record.mode).toBe("simple"); // default mode
+    expect(record).not.toHaveProperty("serverKey");
+    expect(record.mode).toBe("simple");
   });
 
   it("stores mode=bill when specified", async () => {
@@ -113,7 +105,6 @@ describe("POST /api/shorten", () => {
       },
       body: JSON.stringify({
         ciphertext: "bill-ct",
-        serverKey: "bill-sk",
         mode: "bill",
       }),
     });
@@ -134,14 +125,14 @@ describe("POST /api/shorten", () => {
         Origin: "https://payme.tw",
         "CF-Connecting-IP": "counter-test-ip",
       },
-      body: JSON.stringify({ ciphertext: "ct", serverKey: "sk" }),
+      body: JSON.stringify({ ciphertext: "ct" }),
     });
 
     const counter = await env.SHORTENER_KV.get("_counter");
     expect(counter).toBe("501");
   });
 
-  it("returns 400 for missing fields", async () => {
+  it("returns 400 for missing ciphertext", async () => {
     const response = await SELF.fetch("https://s.payme.tw/api/shorten", {
       method: "POST",
       headers: {
@@ -149,7 +140,7 @@ describe("POST /api/shorten", () => {
         Origin: "https://payme.tw",
         "CF-Connecting-IP": "bad-body-ip",
       },
-      body: JSON.stringify({ ciphertext: "only-ct" }),
+      body: JSON.stringify({ mode: "simple" }),
     });
 
     expect(response.status).toBe(400);
@@ -179,7 +170,7 @@ describe("POST /api/shorten", () => {
         Origin: "https://payme.tw",
         "CF-Connecting-IP": "cors-test-ip",
       },
-      body: JSON.stringify({ ciphertext: "ct", serverKey: "sk" }),
+      body: JSON.stringify({ ciphertext: "ct" }),
     });
 
     expect(response.headers.get("Access-Control-Allow-Origin")).toBe(

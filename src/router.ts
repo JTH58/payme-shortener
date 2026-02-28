@@ -10,7 +10,7 @@ export function matchRoute(request: Request): RouteResult {
   const path = url.pathname;
   const method = request.method;
 
-  if (method === "OPTIONS" && path === "/api/shorten") {
+  if (method === "OPTIONS" && (path === "/api/shorten" || path === "/api/resolve")) {
     return { handler: "cors-preflight", params: {} };
   }
 
@@ -20,6 +20,10 @@ export function matchRoute(request: Request): RouteResult {
 
   if (method === "POST" && path === "/api/shorten") {
     return { handler: "shorten", params: {} };
+  }
+
+  if (method === "POST" && path === "/api/resolve") {
+    return { handler: "resolve-api", params: {} };
   }
 
   if (method === "GET" && /^\/[0-9A-Za-z]{4}$/.test(path)) {

@@ -5,11 +5,11 @@ export function renderLandingPage(): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>s.payme.tw — PayMe.tw 專用安全短連結</title>
-<meta name="description" content="連伺服器自己都解不開的加密短網址。PayMe.tw 專用零知識安全短連結服務。">
+<meta name="description" content="密文儲存加密短網址。PayMe.tw 專用安全短連結服務。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://s.payme.tw/">
 <meta property="og:title" content="s.payme.tw — PayMe.tw 專用安全短連結">
-<meta property="og:description" content="連伺服器自己都解不開的加密短網址。12 小時後，一切自動消失。">
+<meta property="og:description" content="密文儲存加密短網址。12 小時後，一切自動消失。">
 <meta property="og:image" content="https://payme.tw/og-simple.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -18,7 +18,7 @@ export function renderLandingPage(): string {
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="s.payme.tw — PayMe.tw 專用安全短連結">
-<meta name="twitter:description" content="連伺服器自己都解不開的加密短網址。12 小時後，一切自動消失。">
+<meta name="twitter:description" content="密文儲存加密短網址。12 小時後，一切自動消失。">
 <meta name="twitter:image" content="https://payme.tw/og-simple.jpg">
 <link rel="icon" href="https://payme.tw/favicon.ico">
 <link rel="apple-touch-icon" href="https://payme.tw/apple-icon.png">
@@ -58,10 +58,10 @@ td{color:rgba(255,255,255,.45)}
 <div class="hero">
   <div class="badge">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-    Zero Knowledge &bull; AES-256-GCM &bull; Open Source
+    Encrypted Storage &bull; AES-256-GCM &bull; Open Source
   </div>
   <h1>PayMe.tw 專用安全短連結</h1>
-  <p class="subtitle">連伺服器自己都解不開的加密短網址。12 小時後，一切自動消失。</p>
+  <p class="subtitle">你的連結經加密後只存密文，金鑰只在你手中。12 小時後，一切自動消失。</p>
   <a class="cta" href="https://payme.tw">前往 PayMe.tw &rarr;</a>
 </div>
 
@@ -72,14 +72,14 @@ td{color:rgba(255,255,255,.45)}
 </div>
 
 <div class="glass">
-  <h2>零知識加密架構</h2>
-  <p>你的資料被拆成兩半。一半在你手上，一半在伺服器。缺任何一半都無法還原。</p>
+  <h2>密文儲存架構</h2>
+  <p>伺服器只保管密文，解密金鑰只在你的連結裡。沒有金鑰，密文無法還原。</p>
   <table>
-    <tr><th>雙鑰匙分持</th><td>完整解密金鑰被拆為兩半 — ClientKey 藏在網址 # 之後，只有你和收到連結的人持有；ServerKey 存在伺服器端。兩把鑰匙缺一不可。</td></tr>
+    <tr><th>密文儲存</th><td>伺服器只儲存加密後的密文。解密金鑰（ClientKey）藏在網址 # 之後，只有你和收到連結的人持有。</td></tr>
     <tr><th>AES-256-GCM</th><td>與銀行同等級的對稱式加密標準。你的分帳資料在離開瀏覽器之前就已加密。</td></tr>
     <tr><th>URL Hash 隔離</th><td>ClientKey 存在網址的 # 之後。根據 HTTP 協議，# 後面的內容不會被瀏覽器傳送至伺服器。</td></tr>
     <tr><th>12 小時閱後即焚</th><td>所有資料在建立後 12 小時由 Cloudflare 基礎設施自動銷毀。時間到了，物理消失。</td></tr>
-    <tr><th>完整開源</th><td>不要相信我們的話 — 看我們的程式碼。加密邏輯、伺服器邏輯、前端解密流程全部公開。</td></tr>
+    <tr><th>完整開源</th><td>不要相信我們的話 — 看我們的程式碼。加密邏輯、伺服器邏輯全部公開。</td></tr>
   </table>
 </div>
 
@@ -87,9 +87,8 @@ td{color:rgba(255,255,255,.45)}
   <h2>技術規格</h2>
   <table>
     <tr><th>加密演算法</th><td>AES-256-GCM</td></tr>
-    <tr><th>金鑰衍生</th><td>HKDF-SHA256（ClientKey + ServerKey）</td></tr>
+    <tr><th>金鑰衍生</th><td>HKDF-SHA256（ClientKey）</td></tr>
     <tr><th>ClientKey 傳輸</th><td>URL Fragment（# 後），不經過伺服器</td></tr>
-    <tr><th>ServerKey 長度</th><td>32 bytes（256 bits）</td></tr>
     <tr><th>資料存活時間</th><td>12 小時（Cloudflare KV TTL）</td></tr>
     <tr><th>執行環境</th><td>Cloudflare Workers（邊緣運算）</td></tr>
     <tr><th>適用範圍</th><td>僅限 PayMe.tw 分帳連結</td></tr>

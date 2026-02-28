@@ -13,11 +13,7 @@ const OG_META: Record<LinkMode, { title: string; description: string; image: str
   },
 };
 
-export function renderResolvePage(
-  ciphertext: string,
-  serverKey: string,
-  mode: LinkMode = "simple"
-): string {
+export function renderResolvePage(mode: LinkMode = "simple"): string {
   const og = OG_META[mode];
   return `<!DOCTYPE html>
 <html lang="zh-TW">
@@ -68,42 +64,8 @@ p{color:rgba(255,255,255,.4);font-size:.9rem;margin:.25rem 0;line-height:1.5}
 </div>
 <script>
 (function() {
-  var CIPHERTEXT = "${ciphertext}";
-  var SERVER_KEY = "${serverKey}";
-
-  function base64urlDecode(str) {
-    var padded = str.replace(/-/g, '+').replace(/_/g, '/');
-    var binStr = atob(padded);
-    var bytes = new Uint8Array(binStr.length);
-    for (var i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
-    return bytes;
-  }
-
-  async function deriveFullKey(clientKey, serverKeyB64) {
-    var enc = new TextEncoder();
-    var serverKeyBytes = base64urlDecode(serverKeyB64);
-    var ikm = new Uint8Array(enc.encode(clientKey).length + serverKeyBytes.length);
-    ikm.set(enc.encode(clientKey));
-    ikm.set(serverKeyBytes, enc.encode(clientKey).length);
-    var rawKey = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveKey']);
-    return crypto.subtle.deriveKey(
-      { name: 'HKDF', hash: 'SHA-256', salt: enc.encode('payme-shortener-v1'), info: enc.encode('aes-256-gcm') },
-      rawKey,
-      { name: 'AES-GCM', length: 256 },
-      false,
-      ['decrypt']
-    );
-  }
-
-  async function decrypt(ciphertextB64, key) {
-    var combined = base64urlDecode(ciphertextB64);
-    var iv = combined.slice(0, 12);
-    var ct = combined.slice(12);
-    var plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ct);
-    return new TextDecoder().decode(plaintext);
-  }
-
   var app = document.getElementById('app');
+  var code = location.pathname.slice(1);
   var hash = location.hash.slice(1);
   var clientKeyMatch = hash.match(/^[A-Za-z0-9]{4}/);
 
@@ -114,9 +76,16 @@ p{color:rgba(255,255,255,.4);font-size:.9rem;margin:.25rem 0;line-height:1.5}
 
   var clientKey = clientKeyMatch[0];
 
-  deriveFullKey(clientKey, SERVER_KEY)
-    .then(function(key) { return decrypt(CIPHERTEXT, key); })
-    .then(function(url) { location.href = url; })
+  fetch('/api/resolve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: code, clientKey: clientKey })
+  })
+    .then(function(res) {
+      if (!res.ok) throw new Error(res.status);
+      return res.json();
+    })
+    .then(function(data) { location.href = data.url; })
     .catch(function() {
       app.innerHTML = '<div class="error-icon">&#128683;</div><h1>連結無效或已損壞</h1><p>解密失敗，連結可能已被竄改。</p><a class="btn" href="https://payme.tw">前往 PayMe.tw</a>';
     });

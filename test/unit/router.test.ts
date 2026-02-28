@@ -31,4 +31,14 @@ describe("Router", () => {
     const result = matchRoute(makeRequest("OPTIONS", "/api/shorten"));
     expect(result.handler).toBe("cors-preflight");
   });
+
+  it("POST /api/resolve routes to resolve-api", () => {
+    const result = matchRoute(makeRequest("POST", "/api/resolve"));
+    expect(result.handler).toBe("resolve-api");
+  });
+
+  it("OPTIONS /api/resolve routes to cors-preflight", () => {
+    const result = matchRoute(makeRequest("OPTIONS", "/api/resolve"));
+    expect(result.handler).toBe("cors-preflight");
+  });
 });

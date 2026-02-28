@@ -1,7 +1,7 @@
 import { Env } from "./types";
 import { matchRoute } from "./router";
 import { handleShorten } from "./handlers/shorten";
-import { handleResolve } from "./handlers/resolve";
+import { handleResolve, handleResolveApi } from "./handlers/resolve";
 import { handleLanding } from "./handlers/landing";
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -38,6 +38,9 @@ export default {
           break;
         case "resolve":
           response = await handleResolve(route.params.shortCode, env);
+          break;
+        case "resolve-api":
+          response = await handleResolveApi(request, env);
           break;
         case "cors-preflight":
           response = handleCorsPreflight(request);

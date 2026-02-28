@@ -1,10 +1,7 @@
-import { Env } from "../types";
-
-const MAX_REQUESTS = 10;
-
 export async function checkRateLimit(
   ip: string,
-  kv: KVNamespace
+  kv: KVNamespace,
+  maxRequests = 10
 ): Promise<boolean> {
   const minute = Math.floor(Date.now() / 60_000);
   const key = `_rate:${ip}:${minute}`;
@@ -12,7 +9,7 @@ export async function checkRateLimit(
   const current = await kv.get(key);
   const count = current ? parseInt(current, 10) : 0;
 
-  if (count >= MAX_REQUESTS) {
+  if (count >= maxRequests) {
     return false;
   }
 
